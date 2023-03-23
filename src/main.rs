@@ -1,5 +1,4 @@
 use nannou::prelude::*;
-use nannou::state::mouse::Mouse;
 
 struct Bob{
     pos: Vec2,
@@ -51,13 +50,21 @@ fn model(app: &App) -> Model {
 
 fn update(_app: &App, model: &mut Model, _update: Update) {
     // set the acceleration GRAVITY
-    model.rope.angular_acceleration = (-GRAVITY / model.rope.length) * model.rope.angle.sin() * model.bob.mass;
-
     model.rope.angular_velocity += model.rope.angular_acceleration * 0.1;
     model.rope.angle += model.rope.angular_velocity* 0.1;
 
     model.bob.pos.x = model.rope.angle.sin() * model.rope.length;
     model.bob.pos.y = model.rope.angle.cos() * model.rope.length;
+
+
+    if _app.mouse.buttons.left().is_down() {
+        model.rope.angular_velocity = ((_app.mouse.x).atan2(_app.mouse.y)-model.rope.angle) * 10.0;
+        println!("{}", model.rope.angular_velocity);
+        model.rope.angular_acceleration = 0.0;
+        return;
+    }
+
+    model.rope.angular_acceleration = (-GRAVITY / model.rope.length) * model.rope.angle.sin() * model.bob.mass;
 
 
     // add drag to the pendulum
